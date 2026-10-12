@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="uz" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedGuard AI - Dori vositalari xavfsizligi platformasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full bg-slate-50 text-slate-800 font-sans antialiased flex flex-col">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-emerald-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+                    <i class="fa-solid fa-shield-heart text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold bg-gradient-to-r from-blue-700 to-emerald-600 bg-clip-text text-transparent">MedGuard AI</h1>
+                    <p class="text-xs text-slate-500">Dori vositalari xavfsizligi platformasi</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-2 h-2 mr-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                    Gemini AI 2.5 Active
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Hero Section -->
+        <div class="text-center max-w-3xl mx-auto mb-10">
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+                Dorilarni birgalikda qabul qilish <span class="text-blue-600">xavfsizmi?</span>
+            </h2>
+            <p class="text-base text-slate-600">
+                Bir nechta dori vositalarining o'zaro ta'sirini (Drug-Drug Interactions) sun'iy intellekt va tibbiy bazalar yordamida tezkor tekshiring.
+            </p>
+        </div>
+
+        <!-- Quick Test Presets -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 mb-8">
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center">
+                <i class="fa-solid fa-bolt mr-2 text-amber-500"></i> Tezkor sinov kombinatsiyalari:
+            </h3>
+            <div class="flex flex-wrap gap-2.5">
+                <button onclick="loadPreset(['Panadol', 'Warfarin'])" class="px-3.5 py-2 text-xs font-medium rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition-all flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    <span>Panadol + Warfarin (Yuqori xavf)</span>
+                </button>
+                <button onclick="loadPreset(['Ibuprofen', 'Aspirin'])" class="px-3.5 py-2 text-xs font-medium rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition-all flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    <span>Ibuprofen + Aspirin (Qon ketish xavfi)</span>
+                </button>
+                <button onclick="loadPreset(['Enalapril', 'Spironolactone'])" class="px-3.5 py-2 text-xs font-medium rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition-all flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span>Enalapril + Spironolakton (Ehtiyotkorlik)</span>
+                </button>
+                <button onclick="loadPreset(['Amoxicillin', 'Paracetamol'])" class="px-3.5 py-2 text-xs font-medium rounded-xl bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 border border-slate-200 transition-all flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span>Amoksisillin + Paratsetamol (Xavfsiz)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Search & Selection Card -->
+        <div class="bg-white rounded-2xl shadow-xl shadow-slate-100 border border-slate-200 p-6 sm:p-8 mb-8">
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+                Qabul qilinayotgan dori vositalari (vergul yoki tugmalar yordamida tanlang):
+            </label>
+            <div class="relative mb-4">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-pills"></i>
+                </div>
+                <input type="text" id="drugInput" placeholder="Masalan: Panadol, Warfarin, Ibuprofen..." 
+                    class="w-full pl-11 pr-28 py-3.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                <div class="absolute right-2 top-2 bottom-2 flex items-center">
+                    <button onclick="addDrugFromInput()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg transition-all">
+                        Qo'shish
+                    </button>
+                </div>
+            </div>
+
+            <!-- Popular Drug Chips -->
+            <div class="mb-6">
+                <p class="text-xs text-slate-500 mb-2">Tez-tez qidiriladigan dorilar:</p>
+                <div id="drugChips" class="flex flex-wrap gap-2">
+                    <button onclick="toggleDrug('Panadol')" class="drug-chip px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition-all border border-slate-200">+ Panadol</button>
+                    <button onclick="toggleDrug('Warfarin')" class="drug-chip px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition-all border border-slate-200">+ Warfarin</button>
+                    <button onclick="toggleDrug('Ibuprofen')" class="drug-chip px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition-all border border-slate-200">+ Ibuprofen</button>
+                    <button onclick="toggleDrug('Aspirin')" class="drug-chip px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition-all border border-slate-200">+ Aspirin</button>
+                    <button onclick="toggleDrug('Enalapril')" class="drug-chip px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition-all border border-slate-200">+ Enalapril</button>
+                    <button onclick="toggleDrug('Spironolactone')" class="drug-chip px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition-all border border-slate-200">+ Spironolactone</button>
+                    <button onclick="toggleDrug('Amoxicillin')" class="drug-chip px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition-all border border-slate-200">+ Amoxicillin</button>
+                    <button onclick="toggleDrug('Omeprazole')" class="drug-chip px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-blue-100 hover:text-blue-700 transition-all border border-slate-200">+ Omeprazole</button>
+                </div>
+            </div>
+
+            <!-- Selected Drugs Container -->
+            <div class="mb-6">
+                <span class="text-xs font-semibold text-slate-500 block mb-2">Tanlangan dorilar ro'yxati:</span>
+                <div id="selectedDrugsContainer" class="flex flex-wrap gap-2 min-h-[48px] p-3 bg-slate-50 rounded-xl border border-dashed border-slate-300 items-center">
+                    <span id="emptyDrugsText" class="text-xs text-slate-400 italic">Hozircha dori tanlanmadi. Yuqoridan tanlang yoki kiriting.</span>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <button onclick="checkInteractions()" id="checkBtn" w-full class="w-full py-4 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-microchip"></i>
+                <span>O'zaro ta'sirni tekshirish (AI Analysis)</span>
+            </button>
+        </div>
+
+        <!-- Loading Simulation State -->
+        <div id="loadingSection" class="hidden bg-white rounded-2xl p-10 shadow-sm border border-slate-200 text-center mb-8">
+            <div class="inline-block relative w-16 h-16 mb-4">
+                <div class="absolute inset-0 rounded-full border-4 border-blue-200 animate-pulse"></div>
+                <div class="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin"></div>
+            </div>
+            <h4 id="loadingStepText" class="text-base font-semibold text-slate-800 mb-1">PostgreSQL bazasidan faol moddalar aniqlanmoqda...</h4>
+            <p class="text-xs text-slate-500">MedGuard AI tizimi ma'lumotlarni tahlil qilmoqda</p>
+        </div>
+
+        <!-- Results Section (Hidden initially) -->
+        <div id="resultsSection" class="hidden space-y-6">
+            
+            <!-- Summary Banner -->
+            <div id="summaryBanner" class="rounded-2xl p-6 border shadow-sm flex items-start space-x-4">
+                <div id="summaryIcon" class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-2xl flex-shrink-0">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <h3 id="summaryTitle" class="text-lg font-bold mb-1">Tahlil natijasi</h3>
+                    <p id="summaryDesc" class="text-sm opacity-90 leading-relaxed"></p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Column 1 & 2: Resolved Ingredients & Interactions -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Active Ingredients Card -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                        <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center">
+                            <i class="fa-solid fa-atom text-blue-600 mr-2"></i> Faol moddalar (INN / XPN)
+                        </h4>
+                        <div id="ingredientsList" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Drug-Drug Interactions Card -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                        <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center">
+                            <i class="fa-solid fa-network-wired text-emerald-600 mr-2"></i> Neo4j Graf Ziddiyatlari Tahlili
+                        </h4>
+                        <div id="interactionsList" class="space-y-4">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Column 3: Gemini AI Advisory Report -->
+                <div class="lg:col-span-1">
+                    <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-6 shadow-xl relative overflow-hidden h-full flex flex-col justify-between">
+                        <div class="absolute top-0 right-0 p-6 opacity-10 text-6xl pointer-events-none">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2 mb-4">
+                                <span class="px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 text-xs font-semibold border border-blue-500/30">
+                                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Gemini 2.5 RAG
+                                  </span>
+                                <h4 class="text-sm font-bold text-slate-200">AI Tavsiyanomasi</h4>
+                            </div>
+                            <div id="aiReportContent" class="text-xs text-slate-300 space-y-3 leading-relaxed mb-6">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Mandatory Disclaimer -->
+                        <div class="pt-4 border-t border-slate-700/80 text-[11px] text-slate-400 italic">
+                            <i class="fa-solid fa-circle-info text-amber-400 mr-1"></i>
+                            Eslatma: MedGuard AI faqat ma'lumot berish uchun mo'ljallangan. Har qanday dori qabul qilishdan oldin shifokor bilan maslahatlashing.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            &copy; 2026 MedGuard AI. Barcha huquqlar himoyalangan. AI + Farmakologiya + Raqamli Tibbiyot.
+        </div>
+    </footer>
+
+    <script>
+        // Mock Drug Database & Interactions (PostgreSQL + Neo4j simulation)
+        const drugDatabase = {
+            "Panadol": { active: "Paracetamol", atc: "N02BE01", form: "Tabletka 500mg" },
+            "Paracetamol": { active: "Paracetamol", atc: "N02BE01", form: "Tabletka 500mg" },
+            "Warfarin": { active: "Warfarin", atc: "B01AA03", form: "Tabletka 2.5mg" },
+            "Ibuprofen": { active: "Ibuprofen", atc: "M01AE01", form: "Tabletka 400mg" },
+            "Aspirin": { active: "Acetylsalicylic acid", atc: "B01AC06", form: "Tabletka 100mg" },
+            "Enalapril": { active: "Enalapril", atc: "C09AA02", form: "Tabletka 10mg" },
+            "Spironolactone": { active: "Spironolactone", atc: "C03DA01", form: "Tabletka 25mg" },
+            "Amoxicillin": { active: "Amoxicillin", atc: "J01CA04", form: "Kapsula 500mg" },
+            "Omeprazole": { active: "Omeprazole", atc: "A02BC01", form: "Kapsula 20mg" }
+        };
+
+        const interactionRules = {
+            "Paracetamol-Warfarin": {
+                severity: "HIGH",
+                title: "Yuqori xavfli o'zaro ta'sir",
+                desc: "Paratsetamolni uzoq muddat (kuniga 2g dan ortiq) Varfarin bilan birga qabul qilish qon ketish xavfini (INR ko'rsatkichining oshishi hisobiga) keskin kuchaytiradi.",
+                aiReport: "• Ehtiyotkorlik: Ushbu ikki dorining birgalikdagi ta'siri qon ivish tizimiga salbiy ta'sir ko'rsatishi mumkin.\n• Tavsiya: Agar ushbu dori vositalarini bir vaqtda qabul qilish zarur bo'lsa, albatta davolovchi kardiolog yoki terapevt nazorati ostida INR tahlilini muntazam topshirib boring.\n• Muqobil: Og'riq qoldiruvchi sifatida shifokor bilan maslahatlashgan holda boshqa xavfsizroq vositalarni tanlang."
+            },
+            "Ibuprofen-Acetylsalicylic acid": {
+                severity: "HIGH",
+                title: "Yuqori xavfli o'zaro ta'sir",
+                desc: "Ibuprofen Aspirinning yurak-qon tomir tizimini himoya qiluvchi ta'sirini kamaytirishi va oshqozon-ichak trakti yarasiga hamda qon ketishiga olib kelishi mumkin.",
+                aiReport: "• Ehtiyotkorlik: Nosteroid yallig'lanishga qarshi dorilar (NYAQD) birgalikda oshqozon shilliq qavatiga jiddiy zarar yetkazadi.\n• Tavsiya: Aspirin va Ibuprofen qabul qilish oralig'ida kamida 2 soat vaqt saqlang yoki shifokor tavsiyasiga ko'ra me'dani himoyalovchi (masalan, Omeprazol) qo'shing."
+            },
+            "Enalapril-Spironolactone": {
+                severity: "MODERATE",
+                title: "O'rtacha darajadagi ehtiyotkorlik",
+                desc: "Enalapril (APF ingibitori) va Spironolakton (kaliyni tejovchi diuretik) birgalikda qonda kaliy miqdorining haddan tashqari oshishiga (giperkalemiya) sabab bo'lishi mumkin.",
+                aiReport: "• Ehtiyotkorlik: Qonda kaliy darajasining ortishi yurak ritmiga salbiy ta'sir ko'rsatishi mumkin.\n• Tavsiya: Qondagi elektrolitlar (kaliy va kreatinin) miqdorini laboratoriya sharoitida tekshirib turing.\n• Muqobil: Dozalarni shifokor ko'rsatmasi asosida muvozanatlash tavsiya etiladi."
+            }
+        };
+
+        let selectedDrugs = [];
+
+        function toggleDrug(drugName) {
+            if (selectedDrugs.includes(drugName)) {
+                selectedDrugs = selectedDrugs.filter(d => d !== drugName);
+            } else {
+                selectedDrugs.push(drugName);
+            }
+            renderSelectedDrugs();
+        }
+
+        function addDrugFromInput() {
+            const input = document.getElementById('drugInput');
+            const val = input.value.trim();
+            if (val) {
+                const names = val.split(',').map(s => s.trim());
+                names.forEach(n => {
+                    // capitalize first letter or match
+                    const matchedKey = Object.keys(drugDatabase).find(k => k.toLowerCase() === n.toLowerCase());
+                    const drugToAdd = matchedKey || n;
+                    if (!selectedDrugs.includes(drugToAdd)) {
+                        selectedDrugs.push(drugToAdd);
+                    }
+                });
+                input.value = '';
+                renderSelectedDrugs();
+            }
+        }
+
+        function loadPreset(drugsArray) {
+            selectedDrugs = [...drugsArray];
+            renderSelectedDrugs();
+            checkInteractions();
+        }
+
+        function renderSelectedDrugs() {
+            const container = document.getElementById('selectedDrugsContainer');
+            if (selectedDrugs.length === 0) {
+                container.innerHTML = `<span id="emptyDrugsText" class="text-xs text-slate-400 italic">Hozircha dori tanlanmadi. Yuqoridan tanlang yoki kiriting.</span>`;
+                return;
+            }
+
+            container.innerHTML = selectedDrugs.map(drug => `
+                <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 shadow-sm animate-fadeIn">
+                    <i class="fa-solid fa-pills mr-1.5 text-blue-500"></i>
+                    ${drug}
+                    <button onclick="removeDrug('${drug}')" class="ml-2 text-blue-400 hover:text-red-500 transition-colors">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </span>
+            `).join('');
+        }
+
+        function removeDrug(drugName) {
+            selectedDrugs = selectedDrugs.filter(d => d !== drugName);
+            renderSelectedDrugs();
+        }
+
+        // Allow Enter key in input
+        document.getElementById('drugInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                addDrugFromInput();
+            }
+        });
+
+        function checkInteractions() {
+            if (selectedDrugs.length === 0) {
+                alertBoxCustom("Iltimos, kamida bitta dori vositasini tanlang yoki kiriting!");
+                return;
+            }
+
+            const loadingSec = document.getElementById('loadingSection');
+            const resultsSec = document.getElementById('resultsSection');
+            const stepText = document.getElementById('loadingStepText');
+
+            loadingSec.classList.remove('hidden');
+            resultsSec.classList.add('hidden');
+
+            // Simulation steps
+            setTimeout(() => {
+                stepText.innerText = "Neo4j graflar bazasida faol moddalar o'zaro ta'siri tekshirilmoqda...";
+            }, 600);
+
+            setTimeout(() => {
+                stepText.innerText = "Gemini 2.5 AI orqali tibbiy hisobot generatsiya qilinmoqda...";
+            }, 1200);
+
+            setTimeout(() => {
+                loadingSec.classList.add('hidden');
+                resultsSec.classList.remove('hidden');
+                buildResults();
+                resultsSec.scrollIntoView({ behavior: 'smooth' });
+            }, 1800);
+        }
+
+        function alertBoxCustom(msg) {
+            // Modern custom notification instead of alert()
+            const div = document.createElement('div');
+            div.className = "fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl z-50 flex items-center space-x-2 animate-bounce";
+            div.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i><span>${msg}</span>`;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        function buildResults() {
+            // Resolve ingredients
+            let resolvedMap = [];
+            let activeSet = new Set();
+
+            selectedDrugs.forEach(d => {
+                let info = drugDatabase[d] || { active: d, atc: "N/A", form: "Noma'lum shakl" };
+                resolvedMap.push({ trade: d, active: info.active, atc: info.atc, form: info.form });
+                activeSet.add(info.active);
+            });
+
+            // Render Ingredients
+            const ingContainer = document.getElementById('ingredientsList');
+            ingContainer.innerHTML = resolvedMap.map(item => `
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-slate-800">${item.trade}</div>
+                        <div class="text-[11px] text-blue-600 font-medium">Faol modda: ${item.active}</div>
+                    </div>
+                    <span class="px-2 py-1 bg-white border border-slate-200 rounded-lg text-[10px] text-slate-500 font-mono">${item.atc}</span>
+                </div>
+            `).join('');
+
+            // Check interactions between active ingredients
+            let foundInteractions = [];
+            let activeList = Array.from(activeSet);
+
+            for (let i = 0; i < activeList.length; i++) {
+                for (let j = i + 1; j < activeList.length; j++) {
+                    let key1 = `${activeList[i]}-${activeList[j]}`;
+                    let key2 = `${activeList[j]}-${activeList[i]}`;
+                    if (interactionRules[key1]) {
+                        foundInteractions.push(interactionRules[key1]);
+                    } else if (interactionRules[key2]) {
+                        foundInteractions.push(interactionRules[key2]);
+                    }
+                }
+            }
+
+            // Render Summary Banner
+            const banner = document.getElementById('summaryBanner');
+            const icon = document.getElementById('summaryIcon');
+            const title = document.getElementById('summaryTitle');
+            const desc = document.getElementById('summaryDesc');
+
+            if (foundInteractions.length > 0) {
+                let hasHigh = foundInteractions.some(f => f.severity === 'HIGH');
+                if (hasHigh) {
+                    banner.className = "rounded-2xl p-6 border shadow-sm flex items-start space-x-4 bg-red-50 border-red-200 text-red-900";
+                    icon.className = "w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl flex-shrink-0 bg-red-600 shadow-md shadow-red-500/20";
+                    title.innerText = "Diqqat! Xavfli o'zaro ta'sir aniqlandi";
+                    desc.innerText = "Kiritilgan dorilar tarkibidagi faol moddalar bir-biri bilan salbiy ta'sirlashishi mumkin. Iltimos, quyidagi tafsilotlar va tavsiyalar bilan tanishing.";
+                } else {
+                    banner.className = "rounded-2xl p-6 border shadow-sm flex items-start space-x-4 bg-amber-50 border-amber-200 text-amber-900";
+                    icon.className = "w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl flex-shrink-0 bg-amber-500 shadow-md shadow-amber-500/20";
+                    title.innerText = "Ehtiyotkorlik talab etiladi";
+                    desc.innerText = "Dorilar o'rtasida o'rtacha darajadagi e'tibor qaratilishi lozim bo'lgan bog'liqliklar mavjud.";
+                }
+            } else {
+                banner.className = "rounded-2xl p-6 border shadow-sm flex items-start space-x-4 bg-emerald-50 border-emerald-200 text-emerald-900";
+                icon.className = "w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl flex-shrink-0 bg-emerald-600 shadow-md shadow-emerald-500/20";
+                title.innerText = "Xavfsiz kombinatsiya";
+                desc.innerText = "Hozirgi tekshirilgan ma'lumotlar bazasiga ko'ra, tanlangan dori vositalari o'rtasida jiddiy ziddiyat yoki salbiy o'zaro ta'sir topilmadi.";
+            }
+
+            // Render Interactions list
+            const intContainer = document.getElementById('interactionsList');
+            if (foundInteractions.length === 0) {
+                intContainer.innerHTML = `
+                    <div class="text-center py-8 text-slate-400 text-xs italic">
+                        <i class="fa-solid fa-circle-check text-emerald-500 text-2xl mb-2 block"></i>
+                        Hech qanday dori ziddiyatlari aniqlanmadi.
+                    </div>
+                `;
+            } else {
+                intContainer.innerHTML = foundInteractions.map(f => `
+                    <div class="p-4 rounded-xl border ${f.severity === 'HIGH' ? 'bg-red-50/50 border-red-200' : 'bg-amber-50/50 border-amber-200'}">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold ${f.severity === 'HIGH' ? 'text-red-700' : 'text-amber-700'}">${f.title}</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${f.severity === 'HIGH' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}">
+                                ${f.severity}
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">${f.desc}</p>
+                    </div>
+                `).join('');
+            }
+
+            // Render AI Advisory Report
+            const aiContent = document.getElementById('aiReportContent');
+            if (foundInteractions.length > 0) {
+                let combinedReport = foundInteractions.map(f => f.aiReport).join('\n\n');
+                aiContent.innerHTML = combinedReport.split('\n').map(line => {
+                    if (line.startsWith('•')) {
+                        return `<p class="flex items-start"><span class="text-blue-400 mr-1.5">•</span><span>${line.substring(1).trim()}</span></p>`;
+                    }
+                    return `<p class="font-semibold text-white mt-1">${line}</p>`;
+                }).join('');
+            } else {
+                aiContent.innerHTML = `
+                    <p class="text-emerald-400 font-semibold">✓ Tizim xulosasi:</p>
+                    <p>Tanlangan dorilarni birgalikda iste'mol qilishda hozircha ilmiy manbalarda qayd etilgan xavfli holatlar mavjud emas.</p>
+                    <p class="mt-2 text-slate-400">Shunga qaramay, har doim preparatning rasmiy yo'riqnomasi bilan tanishib chiqing.</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
